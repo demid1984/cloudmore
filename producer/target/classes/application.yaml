@@ -1,0 +1,25 @@
+spring:
+  config:
+    name: producer
+  liquibase:
+    change-log: classpath:liquibase/changelog.xml
+  batch:
+    jdbc:
+      initialize-schema: never
+    job:
+      enabled: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_SERVER}:3306/producer?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC
+    username: javauser
+    password: java
+
+springdoc:
+  swagger-ui:
+    path: /producer-swagger/swagger-ui.html
+
+producer:
+  topic: customerRequest
+
+price:
+  tax: 10

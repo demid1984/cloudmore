@@ -1,0 +1,32 @@
+{
+  "groups": [
+    {
+      "name": "price",
+      "type": "com.cloudmore.producer.settings.PriceSettings",
+      "sourceType": "com.cloudmore.producer.settings.PriceSettings"
+    },
+    {
+      "name": "producer",
+      "type": "com.cloudmore.producer.settings.ProducerSettings",
+      "sourceType": "com.cloudmore.producer.settings.ProducerSettings"
+    }
+  ],
+  "properties": [
+    {
+      "name": "price.tax",
+      "type": "java.lang.Integer",
+      "sourceType": "com.cloudmore.producer.settings.PriceSettings"
+    },
+    {
+      "name": "producer.tax",
+      "type": "java.lang.Integer",
+      "sourceType": "com.cloudmore.producer.settings.ProducerSettings"
+    },
+    {
+      "name": "producer.topic",
+      "type": "java.lang.String",
+      "sourceType": "com.cloudmore.producer.settings.ProducerSettings"
+    }
+  ],
+  "hints": []
+}

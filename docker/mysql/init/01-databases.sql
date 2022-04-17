@@ -1,0 +1,4 @@
+CREATE DATABASE IF NOT EXISTS producer;
+CREATE DATABASE IF NOT EXISTS consumer;
+CREATE USER 'javauser'@'%' IDENTIFIED BY 'java';
+GRANT ALL PRIVILEGES ON *.* TO 'javauser'@'%';
