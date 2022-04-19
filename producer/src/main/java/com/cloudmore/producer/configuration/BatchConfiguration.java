@@ -2,13 +2,18 @@ package com.cloudmore.producer.configuration;
 
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
+import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.RepositoryItemWriter;
@@ -18,10 +23,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort;
 import org.springframework.kafka.core.KafkaTemplate;
+import com.cloudmore.producer.batch.KafkaJobExecutionListener;
 import com.cloudmore.producer.batch.MessageProcessor;
 import com.cloudmore.producer.database.entity.KafkaEntity;
 import com.cloudmore.producer.database.repository.KafkaObjectRepository;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @EnableBatchProcessing
 @Configuration
 public class BatchConfiguration {
@@ -46,36 +54,28 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public JobExecutionListener jobExecutionListener() {
-        return new JobExecutionListener() {
-            @Override
-            public void beforeJob(JobExecution jobExecution) {
-
-            }
-
-            @Override
-            public void afterJob(JobExecution jobExecution) {
-
-            }
-        };
+    public JobExecutionListener jobExecutionListener(JobExplorer explorer) {
+        return new KafkaJobExecutionListener(explorer);
     }
 
     @Bean
-    public Job kafkaMessageJob(JobBuilderFactory jobBuilderFactory, Step step1) {
+    public Job kafkaMessageJob(JobBuilderFactory jobBuilderFactory,
+                               Step kafkaSenderStep,
+                               JobExecutionListener listener) {
         return jobBuilderFactory.get("kafkaMessageJob")
                 .incrementer(new RunIdIncrementer())
-                .listener(jobExecutionListener())
-                .flow(step1)
+                .listener(listener)
+                .flow(kafkaSenderStep)
                 .end()
                 .build();
     }
 
     @Bean
-    public Step step1(StepBuilderFactory stepBuilderFactory,
+    public Step kafkaSenderStep(StepBuilderFactory stepBuilderFactory,
                       RepositoryItemReader<KafkaEntity> reader,
                       RepositoryItemWriter<KafkaEntity> writer,
                       MessageProcessor processor) {
-        return stepBuilderFactory.get("step1")
+        return stepBuilderFactory.get("kafkaSenderStep")
                 .<KafkaEntity, KafkaEntity> chunk(5)
                 .reader(reader)
                 .processor(processor)

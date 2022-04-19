@@ -16,5 +16,5 @@ spring:
       auto-offset-reset: earliest
 
 consumer:
-  group-version: v2
+  group-version: v1
   topic: customerRequest
