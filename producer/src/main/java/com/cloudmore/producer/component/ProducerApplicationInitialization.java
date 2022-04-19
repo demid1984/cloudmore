@@ -8,8 +8,8 @@ public class ProducerApplicationInitialization implements ApplicationContextInit
 
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
-        if (!StringUtils.hasLength(applicationContext.getEnvironment().getProperty("MYSQL_SERVER"))) {
-            throw new IllegalStateException("MYSQL_SERVER variable is empty. Please use it for setting mysql database address.");
+        if (!StringUtils.hasLength(applicationContext.getEnvironment().getProperty("MYSQL_HOST"))) {
+            throw new IllegalStateException("MYSQL_HOST variable is empty. Please use it for setting mysql database address.");
         }
         if (!StringUtils.hasLength(applicationContext.getEnvironment().getProperty("KAFKA_SERVERS"))) {
             throw new IllegalStateException("KAFKA_SERVERS variable is empty. Please use it for setting kafka address and port.");

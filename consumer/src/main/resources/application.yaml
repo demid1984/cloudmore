@@ -5,7 +5,7 @@ spring:
     change-log: classpath:liquibase/changelog.xml
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_SERVER}:3306/consumer?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC
+    url: jdbc:mysql://${MYSQL_HOST}:3306/consumer?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC
     username: javauser
     password: java
   kafka:

@@ -81,6 +81,7 @@
     </dependencies>
 
     <build>
+        <finalName>producer</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
