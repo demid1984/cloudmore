@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.cloudmore.producer.endpoint.model.Request;
-import com.cloudmore.producer.interprocess.CustomerKafkaMessage;
-import com.cloudmore.producer.interprocess.MessageSender;
+import com.cloudmore.interprocess.event.CustomerKafkaMessageEvent;
 import com.cloudmore.interprocess.utils.MoneyConverter;
+import com.cloudmore.producer.endpoint.model.Request;
+import com.cloudmore.producer.interprocess.MessageSender;
 import com.cloudmore.producer.service.PriceCalculator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,8 +38,8 @@ public class CustomerApi {
                     content = @Content) })
     @PostMapping("/receipt")
     public ResponseEntity<Void> produce(@Valid @RequestBody Request request) {
-        var message = CustomerKafkaMessage.builder()
-                .operationId(UUID.randomUUID())
+        var message = CustomerKafkaMessageEvent.builder()
+                .operationId(UUID.randomUUID().toString())
                 .name(request.getName())
                 .surname(request.getSurname())
                 .amount(MoneyConverter.convertToCoins(priceCalculator.calculateWithTax(request.getWage())))

@@ -2,6 +2,7 @@ package com.cloudmore.producer.interprocess;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.cloudmore.interprocess.event.CustomerKafkaMessageEvent;
 import com.cloudmore.producer.database.entity.KafkaEntity;
 import com.cloudmore.producer.database.repository.KafkaObjectRepository;
 import com.cloudmore.producer.settings.ProducerSettings;
@@ -18,7 +19,7 @@ public class MessageSender {
     private final ProducerSettings producerSettings;
 
     @Transactional
-    public void send(CustomerKafkaMessage message) throws JsonProcessingException {
+    public void send(CustomerKafkaMessageEvent message) throws JsonProcessingException {
         var key = String.format("%s %s", message.getName(), message.getSurname()).hashCode();
         var kafkaMessage = objectMapper.writeValueAsString(message);
 

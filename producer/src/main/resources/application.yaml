@@ -8,6 +8,11 @@ spring:
       initialize-schema: never
     job:
       enabled: false
+  kafka:
+    producer:
+      bootstrap-servers: ${KAFKA_SERVERS:}
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      client-id: ${spring.application.name}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${MYSQL_SERVER}:3306/producer?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC

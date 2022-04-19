@@ -9,12 +9,6 @@ services:
         environment:
             MYSQL_ROOT_PASSWORD: root
         command: --long_query_time=100 --slow_query_log='OFF' --slow_query_log_file='/var/lib/mysql/slow.log' --character_set_server=utf8 --collation-server=utf8_bin --default-time-zone='UTC'
-    swagger-ui:
-        image: swaggerapi/swagger-ui
-        restart: always
-        container_name: cloudmore_swagger
-        environment:
-            BASE_URL: /swagger
     kafka:
         image: wurstmeister/kafka:latest
         restart: always

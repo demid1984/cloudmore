@@ -1,6 +1,6 @@
 package com.cloudmore.producer.endpoint.model;
 
-import java.time.Instant;
+import java.time.ZonedDateTime;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -25,6 +25,6 @@ public class Request {
     private double wage;
 
     @NotNull
-    private Instant eventTime;
+    private ZonedDateTime eventTime;
 
 }

@@ -12,18 +12,18 @@ import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.KafkaListenerConfigurer;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.config.KafkaListenerEndpointRegistrar;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.listener.SeekToCurrentErrorHandler;
+import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.DeserializationException;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -34,15 +34,16 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.backoff.FixedBackOff;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import com.cloudmore.interprocess.event.CustomerKafkaMessageEvent;
 import lombok.RequiredArgsConstructor;
 
 @EnableKafka
 @Configuration
 @RequiredArgsConstructor
-public class KafkaConfiguration implements KafkaListenerConfigurer, BeanPostProcessor {
+public class KafkaConfiguration implements BeanPostProcessor {
 
     private final Map<String, Class<?>> topicClassMap = new HashMap<>();
-    private final LocalValidatorFactoryBean validatorFactory;
+    private final ConfigurableBeanFactory beanFactory;
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
@@ -61,7 +62,7 @@ public class KafkaConfiguration implements KafkaListenerConfigurer, BeanPostProc
                                 .map(Parameter::getType)
                                 .orElseThrow(() -> new IllegalStateException("Cannot find @Payload annotation in kafka listener"));
                     }
-                    Stream.of(kafkaTopics).forEach(t -> topicClassMap.putIfAbsent(t, kafkaMessageCls));
+                    Stream.of(kafkaTopics).forEach(t -> topicClassMap.putIfAbsent(beanFactory.resolveEmbeddedValue(t), kafkaMessageCls));
                 });
         return bean;
     }
@@ -99,21 +100,16 @@ public class KafkaConfiguration implements KafkaListenerConfigurer, BeanPostProc
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         configurer.configure((ConcurrentKafkaListenerContainerFactory) factory, (ConsumerFactory) kafkaConsumerFactory);
         var backoff = new FixedBackOff(2500, 500);
-        factory.setErrorHandler(new SeekToCurrentErrorHandler(backoff));
+        factory.setCommonErrorHandler(new DefaultErrorHandler(backoff));
         return factory;
 
-    }
-
-    @Override
-    public void configureKafkaListeners(KafkaListenerEndpointRegistrar registrar) {
-        registrar.setMessageHandlerMethodFactory(kafkaHandlerMethodFactory());
     }
 
     @Bean
-    public MessageHandlerMethodFactory kafkaHandlerMethodFactory() {
-        var factory = new DefaultMessageHandlerMethodFactory();
-        factory.setValidator(validatorFactory);
-        return factory;
+    public MessageHandlerMethodFactory kafkaHandlerMethodFactory(LocalValidatorFactoryBean validatorFactory) {
+        var messageHandlerMethodFactory = new DefaultMessageHandlerMethodFactory();
+        messageHandlerMethodFactory.setValidator(validatorFactory);
+        return messageHandlerMethodFactory;
     }
 
 }

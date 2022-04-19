@@ -1,0 +1,20 @@
+spring:
+  config:
+    name: consumer
+  liquibase:
+    change-log: classpath:liquibase/changelog.xml
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_SERVER}:3306/consumer?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC
+    username: javauser
+    password: java
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:}
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+
+consumer:
+  group-version: v2
+  topic: customerRequest

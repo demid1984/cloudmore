@@ -1,4 +1,4 @@
-package com.cloudmore.producer.settings;
+package com.cloudmore.consumer.settings;
 
 import javax.validation.constraints.NotEmpty;
 
@@ -8,10 +8,10 @@ import lombok.Data;
 
 @Data
 @Configuration
-@ConfigurationProperties(value = "producer")
-public class ProducerSettings {
+@ConfigurationProperties(value = "consumer")
+public class ConsumerSettings {
 
     @NotEmpty
     private String topic;
-
+    private String groupVersion;
 }
