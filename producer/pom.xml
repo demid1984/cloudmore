@@ -15,6 +15,7 @@
     <description>producer</description>
     <properties>
         <java.version>11</java.version>
+        <test-containers.version>1.17.1</test-containers.version>
     </properties>
     <dependencies>
         <dependency>
@@ -76,6 +77,24 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>kafka</artifactId>
+            <version>${test-containers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${test-containers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mysql</artifactId>
+            <version>${test-containers.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

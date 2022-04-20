@@ -38,20 +38,23 @@ public class CustomerApi {
                     content = @Content) })
     @PostMapping("/receipt")
     public ResponseEntity<Void> produce(@Valid @RequestBody Request request) {
-        var message = CustomerKafkaMessageEvent.builder()
-                .operationId(UUID.randomUUID().toString())
-                .name(request.getName())
-                .surname(request.getSurname())
-                .amount(MoneyConverter.convertToCoins(priceCalculator.calculateWithTax(request.getWage())))
-                .eventTime(request.getEventTime())
-                .build();
         try {
-            sender.send(message);
+            sender.send(convertToMessage(request));
             return ResponseEntity.noContent().build();
         } catch (JsonProcessingException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    CustomerKafkaMessageEvent convertToMessage(Request request) {
+        return CustomerKafkaMessageEvent.builder()
+                .operationId(UUID.randomUUID().toString())
+                .name(request.getName())
+                .surname(request.getSurname())
+                .amount(MoneyConverter.convertToCoins(priceCalculator.calculateWithTax(request.getWage())))
+                .eventTime(request.getEventTime())
+                .build();
     }
 }

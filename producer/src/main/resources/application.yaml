@@ -10,12 +10,12 @@ spring:
       enabled: false
   kafka:
     producer:
-      bootstrap-servers: ${KAFKA_SERVERS:}
+      bootstrap-servers: ${KAFKA_SERVERS:localhost}
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
       client-id: ${spring.application.name}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_HOST}:3306/producer?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/producer?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC
     username: javauser
     password: java
 
