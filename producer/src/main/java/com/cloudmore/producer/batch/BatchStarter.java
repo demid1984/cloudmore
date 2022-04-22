@@ -16,6 +16,7 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import com.cloudmore.producer.lock.LockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +27,7 @@ public class BatchStarter implements ApplicationListener<ContextRefreshedEvent> 
 
     private final JobLauncher jobLauncher;
     private final Job kafkaMessageJob;
+    private final LockService lockService;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -36,7 +38,7 @@ public class BatchStarter implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     public void run() {
-        try {
+        try (var lock = lockService.tryLock(kafkaMessageJob.getName())) {
             JobParameters params = new JobParametersBuilder()
                     .addString("JobID", String.valueOf(Instant.now().toEpochMilli()))
                     .toJobParameters();
