@@ -20,6 +20,8 @@ You should use 'producer.sh' and 'consumer.sh' for starting, stopping, watching 
 - start - start application
 - stop - stop application
 - info - watch application log
+- ip - find out container ip
+- uninstall - uninstall container
 
 ## Additional utilities
 - Kafka Web Client - find out IP of 'cloudmore_kafka_web' container, port 9000

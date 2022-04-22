@@ -19,7 +19,7 @@ KAFKA_HOST=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAd
 export KAFKA_SERVERS="$KAFKA_HOST:9092"
 export MYSQL_HOST=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aqf "name=^cloudmore_mysql$"))
 
-mvn clean install -Dmaven.test.skip=true -f consumer/pom.xml
+mvn clean install -f consumer/pom.xml
 if [ $? -ne 0 ]
 then
     echo 'Cannot build consumer or test failed'
@@ -29,7 +29,7 @@ cp consumer/target/consumer.jar app.jar
 docker build --tag="cloudmore/consumer:latest" .
 rm app.jar
 
-mvn clean install -Dmaven.test.skip=true -f producer/pom.xml
+mvn clean install -f producer/pom.xml
 if [ $? -ne 0 ]
 then
     echo 'Cannot build producer or test failed'
@@ -45,14 +45,20 @@ echo 'case $1 in' >> producer.sh
 echo '\tstart)' >> producer.sh
 echo "\t\tdocker run -d -e KAFKA_SERVERS=$KAFKA_SERVERS -e MYSQL_HOST=$MYSQL_HOST --network cloudmore --name cloudmore_producer -P cloudmore/producer:latest" >> producer.sh
 echo "\t\t;;" >> producer.sh
+echo '\tip)' >> producer.sh
+echo "\t\tdocker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' \$(docker ps -aqf 'name=^cloudmore_producer$')" >> producer.sh
+echo "\t\t;;" >> producer.sh
 echo '\tstop)' >> producer.sh
 echo '\t\tdocker stop cloudmore_producer' >> producer.sh
 echo "\t\t;;" >> producer.sh
 echo '\tinfo)' >> producer.sh
 echo '\t\tdocker logs -f cloudmore_producer' >> producer.sh
 echo "\t\t;;" >> producer.sh
+echo '\tuninstall)' >> producer.sh
+echo '\t\tdocker stop cloudmore_producer && docker rm cloudmore_producer' >> producer.sh
+echo "\t\t;;" >> producer.sh
 echo '\t*)' >> producer.sh
-echo '\t\techo "use start/stop/info commands"' >> producer.sh
+echo '\t\techo "use start/stop/info/ip/uninstall commands"' >> producer.sh
 echo "\t\t;;" >> producer.sh
 echo "esac" >> producer.sh
 chmod +x producer.sh
@@ -62,14 +68,20 @@ echo 'case $1 in' >> consumer.sh
 echo '\tstart)' >> consumer.sh
 echo "\t\tdocker run -d -e KAFKA_SERVERS=$KAFKA_SERVERS -e MYSQL_HOST=$MYSQL_HOST --network cloudmore --name cloudmore_consumer -P cloudmore/consumer:latest" >> consumer.sh
 echo "\t\t;;" >> consumer.sh
+echo '\tip)' >> consumer.sh
+echo "\t\tdocker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' \$(docker ps -aqf 'name=^cloudmore_consumer$')" >> consumer.sh
+echo "\t\t;;" >> consumer.sh
 echo '\tstop)' >> consumer.sh
 echo '\t\tdocker stop cloudmore_consumer' >> consumer.sh
 echo "\t\t;;" >> consumer.sh
 echo '\tinfo)' >> consumer.sh
 echo '\t\tdocker logs -f cloudmore_consumer' >> consumer.sh
 echo "\t\t;;" >> consumer.sh
+echo '\tuninstall)' >> consumer.sh
+echo '\t\tdocker stop cloudmore_consumer && docker rm cloudmore_consumer' >> consumer.sh
+echo "\t\t;;" >> consumer.sh
 echo '\t*)' >> consumer.sh
-echo '\t\techo "use start/stop/info commands"' >> consumer.sh
+echo '\t\techo "use start/stop/info/ip/uninstall commands"' >> consumer.sh
 echo "\t\t;;" >> consumer.sh
 echo "esac" >> consumer.sh
 chmod +x consumer.sh
